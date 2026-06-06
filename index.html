@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FireStart — Interactive Prototype v6</title>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────────── */
+:root{
+  --bg:#fff;--bdr:#E5E7EB;--bi:#D1D5DB;
+  --t1:#1A1A1A;--t2:#6B7280;--tm:#9CA3AF;
+  --brand:#E53E2F;--blue:#2563EB;--green:#16A34A;--orange:#F59E0B;
+  --chip:#F3F4F6;--selbg:#EBF2FF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{min-width:1440px;}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;background:#EDEBE6;min-height:100vh;}
+
+/* ── CHROME ─────────────────────────────────────────────────────────── */
+.browser-chrome{max-width:1440px;margin:0 auto;padding:20px 0 0;}
+.browser-bar{background:#E8E6E1;border-radius:10px 10px 0 0;padding:10px 16px;display:flex;align-items:center;gap:10px;}
+.dots{display:flex;gap:6px;}
+.dot-r{width:12px;height:12px;border-radius:50%;background:#FF5F57;}
+.dot-y{width:12px;height:12px;border-radius:50%;background:#FFBD2E;}
+.dot-g{width:12px;height:12px;border-radius:50%;background:#28C840;}
+.url-bar{flex:1;background:#D4D2CD;border-radius:6px;padding:5px 12px;font-size:12px;color:#666;display:flex;align-items:center;gap:6px;}
+.url-bar svg{width:12px;height:12px;flex-shrink:0;}
+
+/* ── APP ─────────────────────────────────────────────────────────────── */
+.app{width:1440px;background:var(--bg);position:relative;overflow:hidden;min-height:600px;}
+
+/* ── NAV ─────────────────────────────────────────────────────────────── */
+.nav{display:flex;align-items:center;height:52px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--bdr);position:relative;z-index:3;}
+.hbtn{display:flex;align-items:center;gap:6px;height:52px;padding:0 14px;margin-left:12px;font-size:13px;font-weight:500;color:var(--brand);border-bottom:2px solid var(--brand);cursor:pointer;transition:color .12s;}
+.hbtn.inactive{color:var(--t2);border-bottom-color:transparent;}
+.modesw{display:flex;align-items:center;background:var(--chip);border-radius:7px;padding:3px;gap:1px;margin-left:12px;}
+.mb{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:5px;border:none;background:transparent;font-size:12px;font-weight:400;color:var(--tm);cursor:pointer;font-family:inherit;transition:all .12s;}
+.mb.on{background:var(--bg);color:var(--t1);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.1);}
+.mb svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.bdg{min-width:15px;height:15px;background:var(--brand);color:#fff;border-radius:8px;font-size:8px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;margin-left:2px;}
+.sp{flex:1;}
+.utils{display:flex;align-items:center;gap:2px;}
+.vd{width:1px;height:18px;background:var(--bdr);margin:0 8px;}
+.uic{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--t2);position:relative;cursor:pointer;}
+.uic:hover{background:var(--chip);}
+.uic svg{width:17px;height:17px;stroke:var(--t2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ndot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--brand);border-radius:50%;border:1.5px solid var(--bg);}
+.av{width:32px;height:32px;border-radius:6px;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:6px;cursor:pointer;}
+
+/* ── ROW 2 ───────────────────────────────────────────────────────────── */
+.row2{display:flex;align-items:center;height:40px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--bdr);}
+.row2.hidden{display:none;}
+.r2i{display:flex;align-items:center;gap:6px;height:40px;padding:0 12px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:color .1s;}
+.r2i.on{color:var(--t1);font-weight:600;border-bottom-color:var(--t1);}
+.r2i svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.r2sr{margin-left:auto;display:flex;align-items:center;gap:6px;height:28px;background:var(--bg);border:1px solid var(--bi);border-radius:6px;padding:0 10px;width:240px;font-size:12px;color:var(--tm);}
+.r2sr svg{width:13px;height:13px;stroke:var(--tm);fill:none;stroke-width:2;}
+
+/* ── HOME ────────────────────────────────────────────────────────────── */
+.home{padding:28px 32px 36px;display:none;}
+.home.show{display:block;}
+.wlc{font-size:22px;font-weight:600;color:var(--t1);}
+.wlc-s{font-size:14px;color:var(--t2);margin-top:4px;}
+.mcards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;}
+.mc{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:18px;display:flex;flex-direction:column;cursor:pointer;transition:border-color .12s;}
+.mc:hover{border-color:var(--bi);}
+.mc.pri{border-color:#BFDBFE;background:#EFF6FF;}
+.mc h4{font-size:14px;font-weight:600;color:var(--t1);}
+.mc p{font-size:11.5px;color:var(--t2);margin-top:3px;}
+.mc .tags{margin-top:10px;flex:1;}
+.mctag{display:inline-block;font-size:10.5px;background:var(--chip);color:var(--t2);border-radius:12px;padding:2px 8px;margin:2px 3px 2px 0;}
+.mc-role-row{display:flex;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--chip);}
+.mc-role{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;font-weight:500;}
+.mc.pri .mc-role{color:var(--brand);}
+.wgs{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-top:16px;}
+.wg{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:16px;}
+.wg-h{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.wg-h a{font-size:11.5px;color:var(--blue);font-weight:400;cursor:pointer;}
+.trow{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bdr);}
+.trow:last-child{border:none;}
+.pill{font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.pu{background:#FEE2E2;color:#991B1B;}.pm{background:#FEF3C7;color:#92400E;}.pl{background:#D1FAE5;color:#065F46;}
+.tn{font-size:13px;color:var(--t1);}.ts2{font-size:11px;color:var(--tm);margin-top:2px;}
+.vlink{font-size:12.5px;color:var(--blue);margin-top:10px;display:inline-block;cursor:pointer;}
+
+/* ── EXECUTE VIEW ────────────────────────────────────────────────────── */
+.exec-body{display:none;grid-template-columns:240px 1fr 220px;min-height:480px;}
+.exec-body.show{display:grid;}
+.exec-sb{background:var(--bg);border-right:1px solid var(--bdr);padding:14px 10px;}
+.sb-search{display:flex;align-items:center;gap:6px;height:32px;background:var(--bg);border:1px solid var(--bi);border-radius:6px;padding:0 10px;font-size:12px;color:var(--tm);margin-bottom:10px;}
+.sb-search svg{width:13px;height:13px;stroke:var(--tm);fill:none;stroke-width:2;}
+.chips{display:flex;gap:5px;margin-bottom:10px;}
+.chip{font-size:11px;padding:3px 11px;border-radius:14px;border:1px solid var(--bdr);background:var(--bg);color:var(--t2);cursor:pointer;}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+.sb-item{padding:8px 9px;border-radius:5px;font-size:12px;color:var(--t1);margin-bottom:2px;cursor:pointer;}
+.sb-item:hover{background:var(--chip);}
+.sb-item.on{background:var(--selbg);}
+.sb-item .meta{font-size:11px;color:var(--t2);margin-top:2px;}
+.sb-dot{color:var(--brand);font-size:9px;margin-right:3px;}
+.exec-main{padding:20px 22px;background:var(--bg);}
+.sec-h{font-size:22px;font-weight:600;color:var(--t1);margin-bottom:14px;}
+.sub-h{font-size:15px;font-weight:600;color:var(--t1);margin:14px 0 8px;display:flex;justify-content:space-between;align-items:center;}
+.field{margin-bottom:11px;}
+.field label{font-size:12px;color:var(--t2);display:block;margin-bottom:4px;}
+.field input{width:100%;font-size:13px;padding:8px 11px;border:1px solid var(--bi);border-radius:6px;background:var(--bg);color:var(--t1);}
+.field input:focus{outline:none;border-color:#93C5FD;}
+.row-f{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.exec-tbl{width:100%;border-collapse:collapse;margin-top:4px;}
+.exec-tbl th{font-size:12px;color:var(--t2);text-align:left;padding:8px 11px;border-bottom:1px solid var(--bdr);}
+.exec-tbl td{font-size:13px;color:var(--t1);padding:8px 11px;border-bottom:1px solid var(--bdr);}
+.exec-foot{display:flex;justify-content:flex-end;padding:12px 0 4px;}
+.btn-blue{font-size:13px;font-weight:600;color:#fff;background:var(--blue);border:none;border-radius:6px;padding:9px 22px;cursor:pointer;}
+.exec-rp{background:var(--bg);border-left:1px solid var(--bdr);padding:14px;}
+.rp-hdr{font-size:12px;color:var(--t2);text-align:center;padding-bottom:9px;border-bottom:1px solid var(--bdr);margin-bottom:10px;}
+.rp-lbl{font-size:11.5px;color:var(--t2);margin-top:10px;margin-bottom:4px;}
+.rp-link{font-size:12px;color:var(--blue);text-decoration:underline;cursor:pointer;}
+.rp-ann{display:block;width:100%;font-size:12.5px;font-weight:600;color:#fff;background:var(--brand);border:none;border-radius:6px;padding:9px;cursor:pointer;margin-top:4px;}
+
+/* ── START FORMS VIEW ─────────────────────────────────────────────────── */
+.sf-body{display:none;grid-template-columns:240px 1fr 220px;min-height:480px;}
+.sf-body.show{display:grid;}
+.sf-main{padding:20px 22px;background:var(--bg);}
+.sf-sec-h{font-size:22px;font-weight:600;color:var(--t1);margin-bottom:14px;}
+.sf-tbl{width:100%;border-collapse:collapse;margin-top:4px;}
+.sf-tbl th{font-size:12px;color:var(--t2);text-align:left;padding:8px 11px;border-bottom:1px solid var(--bdr);}
+.sf-tbl td{font-size:13px;color:var(--t1);padding:8px 11px;border-bottom:1px solid var(--bdr);}
+.sf-sum{font-size:13px;color:var(--t2);margin-top:14px;}
+.sf-foot{display:flex;justify-content:flex-end;padding:14px 0 4px;}
+.btn-green{font-size:13px;font-weight:600;color:#fff;background:var(--green);border:none;border-radius:6px;padding:9px 22px;cursor:pointer;}
+
+/* ── PROCESSES VIEW ─────────────────────────────────────────────────── */
+.proc-body{display:none;grid-template-columns:240px 1fr 220px;min-height:480px;}
+.proc-body.show{display:grid;}
+.proc-canvas{padding:20px 22px;background:var(--bg);overflow:auto;}
+.bpmn-wrap{background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:24px;overflow-x:auto;}
+.bpmn-row{display:flex;align-items:center;gap:10px;}
+.bp-evt{width:34px;height:34px;border-radius:50%;border:2.5px solid #F59E0B;flex-shrink:0;}
+.bp-arr{color:var(--bdr);font-size:14px;flex-shrink:0;}
+.bp-node{background:var(--bg);border:2px solid #20C4B7;border-radius:6px;padding:9px 13px;font-size:10.5px;color:var(--t1);text-align:center;flex-shrink:0;min-width:88px;}
+.bp-ic{font-size:12px;color:#20C4B7;margin-bottom:3px;}
+.bp-gw{width:28px;height:28px;background:#16A34A;transform:rotate(45deg);flex-shrink:0;}
+.bp-note{font-size:10px;color:var(--tm);text-align:center;margin-top:12px;}
+.proc-foot{display:flex;justify-content:flex-end;padding:12px 0 4px;}
+.btn-red{font-size:13px;font-weight:600;color:#fff;background:var(--brand);border:none;border-radius:6px;padding:9px 22px;cursor:pointer;}
+
+/* ── DIM ─────────────────────────────────────────────────────────────── */
+.dim-layer{position:absolute;inset:0;background:rgba(6,8,15,.28);z-index:10;opacity:0;pointer-events:none;transition:opacity .18s;}
+.dim-layer.on{opacity:1;pointer-events:all;}
+
+/* ── OVERLAY PANEL ─────────────────────────────────────────────────── */
+.panel{position:absolute;bottom:24px;left:24px;width:340px;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.13);z-index:20;display:none;}
+.panel.show{display:block;}
+.ph{display:flex;align-items:flex-start;padding:14px 14px 0;gap:10px;border-bottom:1px solid var(--bdr);}
+.ph-dot{width:9px;height:9px;border-radius:50%;background:var(--brand);margin-top:5px;flex-shrink:0;}
+.ph-title{font-size:13.5px;font-weight:600;color:var(--t1);line-height:1.3;}
+.ph-meta{font-size:11px;color:var(--tm);margin-top:3px;padding-bottom:11px;}
+.ph-x{background:none;border:none;cursor:pointer;color:var(--tm);font-size:19px;font-weight:300;line-height:1;padding:0;flex-shrink:0;margin-top:-2px;font-family:inherit;}
+.ph-x:hover{color:var(--t1);}
+.progbar{height:3px;background:var(--chip);}
+.progfill{height:3px;background:var(--brand);transition:width .3s;}
+.pvid{height:120px;background:#111318;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;}
+.pplay{width:40px;height:40px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;}
+.pplay svg{width:16px;height:16px;fill:#fff;margin-left:3px;}
+.pvlabel{font-size:10px;color:rgba(255,255,255,.4);text-align:center;padding:0 14px;line-height:1.4;}
+.psteps{padding:6px 0;}
+.pstep{display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #F9F8F6;}
+.pstep:last-child{border:none;}
+.pnum{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.pnum.done{background:#D1FAE5;color:#065F46;}
+.pnum.active{background:var(--brand);color:#fff;}
+.pnum.idle{background:var(--chip);color:var(--tm);border:1px solid var(--bdr);}
+.pstep-t{font-size:12.5px;color:var(--t1);font-weight:500;line-height:1.35;}
+.pstep-d{font-size:11px;color:var(--t2);margin-top:2px;line-height:1.4;}
+.pstep.done-s .pstep-t{color:var(--tm);font-weight:400;}
+.pstep.idle-s .pstep-t,.pstep.idle-s .pstep-d{color:#ccc;}
+.pchk{display:flex;align-items:center;gap:7px;padding:7px 14px 5px;font-size:11px;color:var(--tm);}
+.pchk input{width:13px;height:13px;accent-color:var(--brand);cursor:pointer;}
+.pfoot{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--bdr);background:#FAFAF8;}
+.p-skip{font-size:12px;color:var(--tm);background:none;border:none;cursor:pointer;font-family:inherit;}
+.p-cta{font-size:12px;font-weight:600;color:#fff;background:var(--brand);border:none;border-radius:6px;padding:8px 15px;cursor:pointer;font-family:inherit;}
+
+/* ── TOOLTIP ─────────────────────────────────────────────────────────── */
+.tt{position:absolute;z-index:30;width:320px;display:none;}
+.tt-card{background:#fff;border:1px solid var(--bdr);border-radius:10px;position:relative;overflow:visible;box-shadow:0 10px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;}
+
+/* arrows */
+.tt[data-dir="down"] .tt-card::before{content:'';position:absolute;bottom:100%;left:var(--ax,28px);border:10px solid transparent;border-bottom-color:var(--bdr);margin-left:-1px;}
+.tt[data-dir="down"] .tt-card::after{content:'';position:absolute;bottom:calc(100% - 1px);left:var(--ax,28px);border:9px solid transparent;border-bottom-color:#fff;}
+.tt[data-dir="up"] .tt-card::before{content:'';position:absolute;top:100%;left:var(--ax,28px);border:10px solid transparent;border-top-color:var(--bdr);margin-left:-1px;}
+.tt[data-dir="up"] .tt-card::after{content:'';position:absolute;top:calc(100% - 1px);left:var(--ax,28px);border:9px solid transparent;border-top-color:#fff;}
+
+.tt-top{padding:16px 16px 0;display:flex;align-items:flex-start;gap:10px;}
+.tt-hl{font-size:14px;font-weight:600;color:var(--t1);line-height:1.38;flex:1;}
+.tt-x{all:unset;cursor:pointer;font-size:20px;font-weight:300;line-height:1;color:var(--tm);flex-shrink:0;margin-top:-2px;}
+.tt-x:hover{color:var(--t1);}
+.tt-bd{padding:8px 16px 4px;}
+.tt-desc{font-size:13px;color:var(--t2);line-height:1.65;}
+.skill-list{display:flex;flex-direction:column;gap:6px;margin-top:12px;width:100%;overflow:hidden;}
+.sk{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--bdr);border-radius:8px;cursor:pointer;background:#fff;width:100%;max-width:100%;overflow:hidden;text-align:left;font-family:inherit;appearance:none;}
+.sk:hover{border-color:var(--bi);background:#FAFAFA;}
+.sk-icon{font-size:18px;line-height:1;flex-shrink:0;width:24px;text-align:center;}
+.sk-text{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;overflow:hidden;}
+.sk-n{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.sk-s{font-size:11px;color:var(--tm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.feat-list{display:flex;flex-direction:column;gap:7px;margin-top:12px;overflow:hidden;}
+.feat{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border:1px solid var(--bdr);border-radius:8px;background:#fff;cursor:pointer;width:100%;max-width:100%;overflow:hidden;text-align:left;font-family:inherit;appearance:none;}
+.feat:hover{border-color:var(--bi);background:#FAFAFA;}
+.feat-ic{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}
+.feat-text{flex:1;min-width:0;}
+.feat-n{font-size:13px;font-weight:600;color:var(--t1);display:block;}
+.feat-s{font-size:11px;color:var(--tm);display:block;margin-top:2px;}
+.tt-ft{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 15px;flex-shrink:0;}
+.prog-wrap{display:flex;align-items:center;gap:8px;flex:1;margin-right:16px;}
+.prog-track{flex:1;height:3px;background:var(--bdr);border-radius:2px;overflow:hidden;}
+.prog-fill{height:3px;background:var(--t1);border-radius:2px;transition:width .22s;}
+.prog-label{font-size:11px;color:var(--tm);white-space:nowrap;flex-shrink:0;}
+.tt-nxt{all:unset;cursor:pointer;font-size:13px;font-weight:500;color:var(--blue);white-space:nowrap;}
+.tt-nxt:hover{opacity:.7;}
+.hl{outline:2.5px solid rgba(37,99,235,.30);outline-offset:4px;border-radius:7px;position:relative;z-index:15;}
+
+/* ── BOTTOM TOOLBAR (actions) ────────────────────────────────────────── */
+.toolbar{background:#FAFAF8;border-top:1px solid var(--bdr);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.tb-btn{font-size:12px;font-weight:500;padding:7px 16px;border-radius:6px;cursor:pointer;border:1px solid var(--bdr);background:#fff;color:var(--t1);font-family:inherit;transition:all .12s;}
+.tb-btn:hover{background:var(--chip);}
+.tb-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);}
+.tb-btn.primary:hover{background:#c93020;}
+.tb-btn.blue{background:var(--blue);color:#fff;border-color:var(--blue);}
+.tb-btn.blue:hover{background:#1d4ed8;}
+.tb-sep{width:1px;height:24px;background:var(--bdr);}
+.tb-label{font-size:11px;color:var(--tm);}
+
+/* ── LOGO SVG inline ─────────────────────────────────────────────────── */
+.logo-svg{display:block;}
+</style>
+</head>
+<body>
+
+<div class="browser-chrome">
+  <div class="browser-bar">
+    <div class="dots"><div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div></div>
+    <div class="url-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      app.firestart.io
+    </div>
+  </div>
+
+  <div class="app" id="app">
+
+    <!-- NAV -->
+    <div class="nav" id="nav">
+      <!-- REAL LOGO -->
+      <svg class="logo-svg" width="30" height="30" viewBox="0 0 631 598" fill="none">
+        <path fill="#E41B24" d="M135.351074,409.460571 C129.624176,409.618286 124.287514,409.599579 118.503265,409.454620 C116.945831,408.958862 115.802376,408.978851 114.313568,409.065887 C91.434113,407.121613 72.131966,397.784363 55.497429,382.827637 C38.672428,367.699677 28.265305,348.692108 22.940582,326.412811 C20.761021,316.020721 21.244707,305.845490 20.879871,295.333740 C20.829050,294.944183 20.791315,294.455444 20.875734,294.225342 C22.398441,289.468384 22.369431,284.689636 23.537411,280.063080 C25.206444,273.451721 27.524101,267.113617 29.838318,260.346863 C43.261013,229.475281 65.886055,209.371948 97.725327,199.683197 C100.730400,198.768753 102.523369,197.944153 103.152885,194.014603 C112.206276,137.501419 142.691406,97.918922 196.864532,77.953262 C222.556870,68.484291 249.023346,68.170685 275.548553,74.656273 C279.128632,75.531624 281.479858,75.052414 284.279785,72.303802 C316.610687,40.565468 355.733643,25.790262 400.611694,30.416315 C450.596924,35.568825 487.846344,61.648094 512.195679,105.696030 C521.979980,123.395813 527.552368,142.472443 529.133545,162.656738 C529.364929,165.610733 530.377808,167.293106 533.264832,168.627853 C575.238953,188.033737 600.147766,220.633514 608.096069,266.573792 C607.782532,271.973236 608.882446,276.861359 609.010498,281.821564 C609.283569,292.400513 607.887817,302.801270 605.927673,313.567902 C600.724182,339.439819 588.392395,360.910278 569.231445,378.358154 C547.924011,397.760651 522.818054,408.526642 493.550873,410.362457 C492.616821,409.527771 492.011017,409.289825 491.061829,410.051636 C489.563049,410.377197 488.224548,410.468719 486.504547,410.418640 C480.373169,409.586395 474.612183,410.104614 468.448120,410.210449 C463.318604,411.055420 458.573456,410.527313 453.394958,410.402954 C449.214478,409.784027 445.470367,409.969086 441.383972,410.197571 C439.940460,410.382751 438.839600,410.489594 437.346313,410.444458 C431.572571,409.710876 426.181732,410.010742 420.416870,410.201965 C416.683258,410.381042 413.325806,410.475708 409.555786,410.433899 C404.885010,408.667725 400.529144,409.599701 395.961121,410.176819 C377.492310,413.891357 363.281036,425.534363 347.669647,434.154816 C323.058929,447.744629 298.905151,462.160522 274.512573,476.147583 C263.580109,482.416443 250.860565,479.322327 244.838333,469.119659 C238.795822,458.882660 242.330963,445.809753 253.284286,439.404907 C272.956909,427.901550 292.772156,416.641876 312.538025,405.298157 C327.832336,396.520721 343.098267,387.692383 358.460449,379.035156 C368.894806,373.154907 380.193665,369.907501 392.546448,368.870544 C393.437286,369.337402 393.963470,369.612701 395.005310,369.846466 C426.224518,370.045959 456.995026,370.199554 488.204437,369.478088 C489.232788,369.343719 489.772095,369.134186 490.613708,368.548340 C507.384796,366.640289 522.248657,361.289032 535.364624,350.909424 C575.899963,318.830566 577.244629,255.848343 538.065796,222.006622 C528.062073,213.365662 516.949341,207.062241 504.256134,203.368683 C492.590179,199.974030 487.089569,191.587524 486.885010,178.500763 C486.239868,137.228714 468.628540,105.554428 432.746155,84.681473 C420.803070,77.734138 407.567596,74.307739 393.384949,73.008926 C388.603271,71.198792 384.126678,72.041763 379.348083,72.568359 C353.014008,75.871277 330.440857,86.125351 312.095001,105.083252 C309.670746,107.588387 307.406921,110.269501 305.259918,113.018387 C298.637970,121.496712 289.365997,124.453735 279.005127,120.697952 C266.329346,116.103035 253.280228,113.785454 239.866211,113.845070 C193.689240,114.050262 152.244659,150.603561 145.930145,196.407700 C145.019028,203.016693 144.520126,209.614853 144.506195,216.286240 C144.478943,229.330566 135.865265,238.208694 122.860802,238.851410 C93.171394,240.318741 67.660667,265.243927 63.634491,294.930817 C59.366741,326.398956 81.216736,361.992096 118.680557,367.107727 C119.686935,367.751007 120.411285,368.058777 121.554535,368.410095 C136.948502,368.712921 151.940079,368.621735 167.344757,368.489563 C168.304260,368.357056 168.810699,368.163635 169.618195,367.645325 C182.479721,366.053925 193.294754,360.658905 204.059692,354.335541 C266.202576,317.832642 328.662537,281.873077 391.343414,246.299133 C401.885895,240.315857 411.655396,240.723145 418.987823,247.648911 C429.908539,257.963959 427.819702,274.741241 414.578369,282.361328 C385.576172,299.051392 356.508820,315.628296 327.523071,332.346741 C290.330414,353.798737 253.171600,375.309662 216.039276,396.865967 C199.901657,406.234283 182.518280,410.341339 163.494080,409.684998 C153.954102,408.438782 144.846191,408.989655 135.351074,409.460571z"/>
+        <path fill="#E41B25" d="M307.355591,517.400696 C320.939484,509.554993 334.213409,501.906006 347.473785,494.233582 C358.417023,487.901917 371.980072,491.314423 377.876312,501.909149 C383.620026,512.229736 379.416809,525.442627 368.648529,531.502502 C353.413116,540.076233 338.230438,548.744751 323.083344,557.473633 C318.082062,560.355713 312.777130,561.225586 307.200012,560.408325 C298.833740,559.182373 292.362122,552.715332 290.468048,543.991333 C288.697113,535.834290 292.403870,526.750061 299.680328,521.816162 C302.015594,520.232666 304.580109,518.987305 307.355591,517.400696z"/>
+      </svg>
+
+      <div class="hbtn" id="hbtn" onclick="goHome()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </div>
+
+      <div class="modesw" id="modesw-el">
+        <button class="mb" id="mb-ex" onclick="setMode('execute')">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Execute<span class="bdg">3</span>
+        </button>
+        <button class="mb" id="mb-bu" onclick="setMode('build')">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.6l-6 6 2 2 6-6a4 4 0 0 0 5.6-5.6l-2.3 2.3-2-2z"/></svg>Build
+        </button>
+        <button class="mb" id="mb-mo" onclick="setMode('monitor')">
+          <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Monitor
+        </button>
+        <button class="mb" id="mb-ad" onclick="setMode('admin')">
+          <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>Admin
+        </button>
+      </div>
+
+      <div class="sp"></div>
+
+      <div class="utils">
+        <div class="vd"></div>
+        <div class="uic">
+          <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="ndot"></span>
+        </div>
+        <div class="uic">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="0.5" fill="#6B7280" stroke="none"/></svg>
+        </div>
+        <div class="uic">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        </div>
+        <div class="av">M</div>
+      </div>
+    </div>
+
+    <!-- ROW 2 -->
+    <div class="row2 hidden" id="row2">
+      <div class="r2i on" id="r2-tasks" onclick="goSection('tasks')">
+        <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Tasks<span class="bdg" style="margin-left:3px;">3</span>
+      </div>
+      <div class="r2i" id="r2-sf" onclick="goSection('startforms')">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Forms
+      </div>
+      <div class="r2sr">
+        <svg viewBox="0 0 24 24" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Tasks suchen…
+      </div>
+    </div>
+
+    <!-- HOME VIEW -->
+    <div class="home show" id="home-view">
+      <div class="wlc">Good morning, <span id="sofia-el">Sofia</span></div>
+      <div class="wlc-s">You have 3 open tasks waiting.</div>
+      <div class="mcards" id="mcards-el">
+        <div class="mc pri" id="mc-ex" onclick="setMode('execute')">
+          <h4>Execute</h4><p>Act on your daily work.</p>
+          <div class="tags"><span class="mctag">Tasks · 3</span><span class="mctag">Start Forms</span></div>
+          <div class="mc-role-row"><span class="mc-role">For business users</span></div>
+        </div>
+        <div class="mc" id="mc-bu" onclick="setMode('build')">
+          <h4>Build</h4><p>Design workflows and forms.</p>
+          <div class="tags"><span class="mctag">Processes</span><span class="mctag">Forms</span><span class="mctag">Tables</span></div>
+          <div class="mc-role-row"><span class="mc-role">For workflow modelers</span></div>
+        </div>
+        <div class="mc" id="mc-mo" onclick="setMode('monitor')">
+          <h4>Monitor</h4><p>Track running instances.</p>
+          <div class="tags"><span class="mctag">Workflows</span><span class="mctag">Landscapes</span></div>
+          <div class="mc-role-row"><span class="mc-role">For process owners</span></div>
+        </div>
+        <div class="mc" id="mc-ad" onclick="setMode('admin')">
+          <h4>Admin</h4><p>Configure access &amp; assets.</p>
+          <div class="tags"><span class="mctag">Groups</span><span class="mctag">Templates</span></div>
+          <div class="mc-role-row"><span class="mc-role">For admins</span></div>
+        </div>
+      </div>
+      <div class="wgs">
+        <div class="wg" id="wg-t">
+          <div class="wg-h">My open tasks <a onclick="setMode('execute')">View all →</a></div>
+          <div class="trow"><span class="pill pu">Urgent</span><div><div class="tn">Review invoice — Mustermann GmbH</div><div class="ts2">Rechnungsprüfung · Due today</div></div></div>
+          <div class="trow"><span class="pill pm">Medium</span><div><div class="tn">Validate customer onboarding form</div><div class="ts2">Approval Process · Due tomorrow</div></div></div>
+          <div class="trow"><span class="pill pl">Low</span><div><div class="tn">Review contract amendment</div><div class="ts2">Contract Management · Due in 3 days</div></div></div>
+        </div>
+        <div class="wg" id="wg-how">
+          <div class="wg-h">How FireStart works</div>
+          <p style="font-size:13px;color:var(--t2);line-height:1.65;margin-top:4px;">Connect forms, actions, integrations and human tasks into automated workflows — with AI agents built in.</p>
+          <span class="vlink">▶ Watch 2-min intro ↗</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXECUTE — TASKS VIEW -->
+    <div class="exec-body" id="exec-view">
+      <div class="exec-sb">
+        <div class="sb-search"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Tasks suchen</div>
+        <div class="chips"><div class="chip on">Offen</div><div class="chip">Fertig</div><div class="chip">Alle</div></div>
+        <div class="sb-item"><span class="sb-dot">●</span>Approval Process<div class="meta">Mo., 1.12.2025</div></div>
+        <div class="sb-item on"><span class="sb-dot">●</span>Rechnungsprüfung durch Buha<div class="meta">Do., 27.11.2025</div></div>
+        <div class="sb-item"><span class="sb-dot">●</span>Rechnungsprüfung durch Buha<div class="meta">Mi., 26.11.2025</div></div>
+        <div class="sb-item"><span class="sb-dot">●</span>Test Task<div class="meta">Mo., 24.11.2025</div></div>
+        <div class="sb-item"><span class="sb-dot">●</span>Incident Review<div class="meta">Mo., 10.11.2025</div></div>
+      </div>
+      <div class="exec-main">
+        <div style="font-size:11px;color:var(--tm);margin-bottom:12px;">Rennweg 97-99, 1030 Wien, Österreich</div>
+        <div class="sec-h">Customer</div>
+        <div class="field"><label>*Customer Name</label><input value="Maximilian Mustermann"></div>
+        <div class="field"><label>*Customer Address</label><input value="Josefstädter Straße 34/12, 1080 Wien"></div>
+        <div class="sec-h" style="margin-top:16px;">Amounts</div>
+        <div class="row-f">
+          <div class="field"><label>*Total Amount</label><input value="65,9"></div>
+          <div class="field"><label>Tax Amount</label><input value="7,15"></div>
+        </div>
+        <div class="sub-h">Line Items <span style="font-size:18px;color:var(--tm);font-weight:300;cursor:pointer;">+</span></div>
+        <table class="exec-tbl">
+          <tr><th>Description</th><th>Quantity</th><th>Total Price</th><th>Unit Price</th></tr>
+          <tr><td>Magenta Leistungen (monatl.)</td><td>1</td><td>42,9</td><td>42,9</td></tr>
+          <tr><td>13. Teilzahlung (Rest 276,00)</td><td>1</td><td>23</td><td>23</td></tr>
+        </table>
+        <div class="exec-foot"><button class="btn-blue">Absenden</button></div>
+      </div>
+      <div class="exec-rp">
+        <div class="rp-hdr">Allgemein</div>
+        <div class="rp-lbl">Verantwortlicher Nutzer:</div>
+        <button class="rp-ann">Annehmen</button>
+        <div class="rp-lbl">Workflow</div>
+        <div class="rp-link">Rechnungsprüfung</div>
+      </div>
+    </div>
+
+    <!-- EXECUTE — START FORMS VIEW -->
+    <div class="sf-body" id="sf-view">
+      <div class="exec-sb">
+        <div class="sb-search"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Startformulare suchen</div>
+        <div class="sb-item"><span class="sb-dot" style="color:transparent">●</span>Start<div class="meta">Rückzahlungsworkflow (2.24)</div></div>
+        <div class="sb-item"><span class="sb-dot" style="color:transparent">●</span>Start<div class="meta">Upload Form (1.6)</div></div>
+        <div class="sb-item on"><span class="sb-dot" style="color:transparent">●</span>Spesenabrechnung<div class="meta">Spesenabrechnung (1.49)</div></div>
+        <div class="sb-item"><span class="sb-dot" style="color:transparent">●</span>Urlaubsantrag DEMO<div class="meta">Urlaubsantrag DEMO (1.7)</div></div>
+      </div>
+      <div class="sf-main">
+        <div class="sf-sec-h">Spesen einreichen</div>
+        <div class="sub-h">Belege <span style="font-size:18px;color:var(--tm);font-weight:300;cursor:pointer;">+</span></div>
+        <table class="sf-tbl">
+          <tr><th>Beleg</th><th>Beschreibung</th><th>Betrag</th></tr>
+          <tr><td colspan="3" style="text-align:center;color:var(--tm);padding:20px;">Keine Daten</td></tr>
+        </table>
+        <div class="sf-sum">Summe der Beträge: <strong>€ 0,00</strong></div>
+        <div class="sf-foot"><button class="btn-green">Einreichen</button></div>
+      </div>
+      <div class="exec-rp">
+        <div class="rp-hdr">Allgemein</div>
+        <div class="rp-lbl">Prozess:</div>
+        <div class="rp-link">Spesenabrechnung (1.49)</div>
+        <div class="rp-lbl">Formular:</div>
+        <div class="rp-link">Spesen einreichen (1.4)</div>
+      </div>
+    </div>
+
+    <!-- BUILD — PROCESSES VIEW -->
+    <div class="proc-body" id="proc-view">
+      <div class="exec-sb">
+        <div class="sb-search"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suche nach Prozessen</div>
+        <div class="sb-item">Beispiel Prozess<div class="meta">Di., 26.5.2026 · v1.0</div></div>
+        <div class="sb-item">HLS - Transportorder<div class="meta">Di., 26.5.2026 · v1.3</div></div>
+        <div class="sb-item on">Feedback - Performance Review<div class="meta">Di., 26.5.2026 · v1.95</div></div>
+        <div class="sb-item">Test Calling<div class="meta">Fr., 22.5.2026 · v1.2</div></div>
+      </div>
+      <div class="proc-canvas">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:12px;">Processes › Feedback - Performance Review (1.95) › Bearbeiten</div>
+        <div class="bpmn-wrap">
+          <div class="bpmn-row">
+            <div class="bp-evt"></div>
+            <div class="bp-arr">→</div>
+            <div class="bp-node"><div class="bp-ic">⚙</div>Access Token holen</div>
+            <div class="bp-arr">→</div>
+            <div class="bp-node"><div class="bp-ic">⚙</div>Mitarbeiter holen</div>
+            <div class="bp-arr">→</div>
+            <div class="bp-node"><div class="bp-ic">⚙</div>Aktive MA filtern</div>
+            <div class="bp-arr">→</div>
+            <div class="bp-gw"></div>
+          </div>
+          <div class="bp-note">Loop — Employment abfragen · Departments holen 1865</div>
+        </div>
+        <div class="proc-foot"><button class="btn-red">Speichern als Hauptversion</button></div>
+      </div>
+      <div class="exec-rp">
+        <div class="rp-hdr">Allgemein</div>
+        <div class="rp-lbl">Name des Prozesses</div>
+        <div style="font-size:12px;color:var(--t1);margin-top:2px;">Feedback - Performance Review</div>
+        <div class="rp-lbl">Ausführbar</div>
+        <div style="font-size:12px;color:var(--green);margin-top:2px;">● Active</div>
+        <button style="display:block;width:100%;font-size:12px;font-weight:600;color:#fff;background:var(--orange);border:none;border-radius:6px;padding:8px;cursor:pointer;margin-top:14px;">Entwurf verwerfen</button>
+      </div>
+    </div>
+
+    <!-- DIM LAYER -->
+    <div class="dim-layer" id="dim"></div>
+
+    <!-- OVERLAY PANEL -->
+    <div class="panel" id="panel">
+      <div class="ph">
+        <span class="ph-dot"></span>
+        <div style="flex:1;">
+          <div class="ph-title">Get to know FireStart</div>
+          <div class="ph-meta" id="panel-meta">~3 minutes · first login only</div>
+        </div>
+        <button class="ph-x" onclick="closePanel()">×</button>
+      </div>
+      <div class="progbar"><div class="progfill" id="panel-prog" style="width:25%"></div></div>
+      <div class="pvid">
+        <div class="pplay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="pvlabel">FireStart — Intelligent Prozessautomation · 2 min</div>
+      </div>
+      <div class="psteps" id="panel-steps"></div>
+      <div class="pchk"><input type="checkbox" id="no-show"><label for="no-show" style="cursor:pointer;">Don't show this again</label></div>
+      <div class="pfoot">
+        <button class="p-skip" onclick="closePanel()">Skip for now</button>
+        <button class="p-cta" id="panel-cta" onclick="advPanel()">Go to Tasks →</button>
+      </div>
+    </div>
+
+    <!-- TOOLTIP -->
+    <div class="tt" id="tt" data-dir="down">
+      <div class="tt-card" id="tt-card">
+        <div class="tt-top">
+          <span class="tt-hl" id="tt-hl"></span>
+          <span class="tt-x" onclick="closeTour()" role="button">×</span>
+        </div>
+        <div class="tt-bd">
+          <div class="tt-desc" id="tt-desc"></div>
+          <div id="tt-xtra"></div>
+        </div>
+        <div class="tt-ft">
+          <div class="prog-wrap">
+            <div class="prog-track"><div class="prog-fill" id="tt-prog"></div></div>
+            <span class="prog-label" id="tt-label">1 / 5</span>
+          </div>
+          <span class="tt-nxt" id="tt-nxt" onclick="advTour()">Next →</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <span class="tb-label">Quick access:</span>
+    <button class="tb-btn primary" onclick="launchTour()">▶ Start guided tour</button>
+    <button class="tb-btn blue" onclick="launchPanel()">⊡ Open onboarding panel</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="goHome()">🏠 Home</button>
+    <button class="tb-btn" onclick="setMode('execute')">⚡ Execute → Tasks</button>
+    <button class="tb-btn" onclick="goSection('startforms')">▶ Start Forms</button>
+    <button class="tb-btn" onclick="setMode('build')">🔧 Build → Processes</button>
+    <div class="tb-sep"></div>
+    <span class="tb-label" id="state-label" style="color:var(--blue);">Home screen</span>
+  </div>
+
+</div><!-- /browser-chrome -->
+
+<script>
+/* ── STATE ── */
+var curMode='', curSection='', tourStep=0, panelStep=1, prevHL=null;
+var TT_W=320;
+
+function R(id){return document.getElementById(id);}
+function scW(){return R('app').getBoundingClientRect().width;}
+function getR(id){
+  var a=R('app').getBoundingClientRect(), e=R(id).getBoundingClientRect();
+  return{t:e.top-a.top,l:e.left-a.left,r:e.right-a.left,b:e.bottom-a.top,w:e.width,h:e.height};
+}
+function clamp(l){return Math.min(Math.max(l,16),scW()-TT_W-16);}
+function setState(label){R('state-label').textContent=label;}
+
+/* ── VIEWS ── */
+function hideAllViews(){
+  R('home-view').classList.remove('show');
+  R('exec-view').classList.remove('show');
+  R('sf-view').classList.remove('show');
+  R('proc-view').classList.remove('show');
+}
+function goHome(){
+  curMode=''; curSection='';
+  hideAllViews();
+  R('home-view').classList.add('show');
+  R('row2').classList.add('hidden');
+  R('hbtn').classList.remove('inactive');
+  ['ex','bu','mo','ad'].forEach(k=>R('mb-'+k).classList.remove('on'));
+  setState('Home screen');
+}
+function setMode(m){
+  curMode=m; curSection='';
+  hideAllViews();
+  R('hbtn').classList.add('inactive');
+  ['ex','bu','mo','ad'].forEach(k=>R('mb-'+k).classList.remove('on'));
+  var modeMap={execute:'ex',build:'bu',monitor:'mo',admin:'ad'};
+  if(modeMap[m]) R('mb-'+modeMap[m]).classList.add('on');
+
+  if(m==='execute'){
+    R('row2').classList.remove('hidden');
+    // update row2 for execute
+    R('row2').innerHTML=
+      '<div class="r2i on" id="r2-tasks" onclick="goSection(\'tasks\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks<span class="bdg" style="margin-left:3px;">3</span></div>'
+      +'<div class="r2i" id="r2-sf" onclick="goSection(\'startforms\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Forms</div>'
+      +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Tasks suchen…</div>';
+    R('exec-view').classList.add('show');
+    setState('Execute → Tasks');
+  } else if(m==='build'){
+    R('row2').classList.remove('hidden');
+    R('row2').innerHTML=
+      '<div class="r2i on" onclick="goSection(\'processes\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 6h6a3 3 0 0 1 3 3M9 18h6a3 3 0 0 0 3-3"/></svg>Processes</div>'
+      +'<div class="r2i" onclick="goSection(\'forms\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 10h8M8 14h5"/></svg>Forms</div>'
+      +'<div class="r2i" onclick="goSection(\'integrations\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v5"/></svg>Integrations</div>'
+      +'<div class="r2i" onclick="goSection(\'tables\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>Tables</div>'
+      +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suche nach Prozessen…</div>';
+    R('proc-view').classList.add('show');
+    setState('Build → Processes');
+  } else if(m==='monitor'||m==='admin'){
+    R('row2').classList.remove('hidden');
+    var items=m==='monitor'
+      ?['Workflows','Landscapes']
+      :['Groups','Templates','Reference'];
+    R('row2').innerHTML=items.map((it,i)=>'<div class="r2i'+(i===0?' on':'')+'" onclick="">'+it+'</div>').join('')
+      +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suchen…</div>';
+    // show placeholder
+    hideAllViews();
+    R('home-view').classList.add('show');
+    R('home-view').querySelector('.wlc').textContent=m==='monitor'?'Monitor':'Admin';
+    R('home-view').querySelector('.wlc-s').textContent=m==='monitor'?'Track all running workflow instances.':'Configure users, roles, and templates.';
+    setState((m==='monitor'?'Monitor':'Admin')+' mode');
+  }
+}
+function goSection(s){
+  curSection=s;
+  hideAllViews();
+  if(s==='tasks'){
+    R('exec-view').classList.add('show');
+    if(R('r2-tasks')){R('r2-tasks').classList.add('on');}
+    if(R('r2-sf')){R('r2-sf').classList.remove('on');}
+    setState('Execute → Tasks');
+  } else if(s==='startforms'){
+    R('sf-view').classList.add('show');
+    if(R('r2-tasks')){R('r2-tasks').classList.remove('on');}
+    if(R('r2-sf')){R('r2-sf').classList.add('on');}
+    setState('Execute → Start Forms');
+  } else if(s==='processes'){
+    R('proc-view').classList.add('show');
+    setState('Build → Processes');
+  }
+}
+
+/* ── PANEL ── */
+var PANEL_STEPS=[
+  {t:'Watch the intro video',d:'See what FireStart automates for your team.',cta:'Go to Tasks →'},
+  {t:'Act on tasks assigned to you',d:'Open Tasks to see work sent through workflows.',cta:'Go to Start Forms →'},
+  {t:'Trigger a workflow with a Start Form',d:'Submit a form to manually kick off a process.',cta:'Go to Processes →'},
+  {t:'Design your first process',d:'Go to Processes and build a runnable workflow.',cta:'Done ✓'}
+];
+function renderPanel(){
+  var h='';
+  PANEL_STEPS.forEach(function(s,i){
+    var cls=i<panelStep-1?'done-s':i===panelStep-1?'':' idle-s';
+    var nc=i<panelStep-1?'done':i===panelStep-1?'active':'idle';
+    var icon=i<panelStep-1?'✓':String(i+1);
+    h+='<div class="pstep'+cls+'"><div class="pnum '+nc+'">'+icon+'</div><div><div class="pstep-t">'+s.t+'</div><div class="pstep-d">'+s.d+'</div></div></div>';
+  });
+  R('panel-steps').innerHTML=h;
+  R('panel-prog').style.width=Math.round(panelStep/4*100)+'%';
+  R('panel-cta').textContent=PANEL_STEPS[panelStep-1].cta;
+}
+function launchPanel(){
+  closeTour();
+  panelStep=1; renderPanel();
+  R('dim').classList.add('on');
+  R('panel').classList.add('show');
+}
+function closePanel(){
+  R('dim').classList.remove('on');
+  R('panel').classList.remove('show');
+}
+function advPanel(){
+  if(panelStep<4){panelStep++;renderPanel();}
+  else{closePanel();}
+}
+
+/* ── TOUR ── */
+var TOUR=[
+  {
+    hl:'Start guided tour', desc:'', xtra:'skill', anchor:'hbtn',
+    onEnter:null,
+    calc:function(){
+      var e=getR('hbtn');
+      var cx=e.l+e.w/2; var ax=32;
+      var left=clamp(cx-ax); ax=cx-left;
+      return{top:e.b+12,left:left,dir:'down',ax:ax};
+    }
+  },
+  {
+    hl:'This is your Home screen', desc:'Your daily starting point. Cards give you instant access to every part of FireStart.',
+    anchor:'sofia-el', onEnter:null,
+    calc:function(){
+      var e=getR('sofia-el');
+      return{top:e.b+30,left:clamp(16),dir:'down',ax:32};
+    }
+  },
+  {
+    hl:'Your work queue, always current', desc:'Tasks assigned through any workflow appear here automatically, sorted by urgency.',
+    anchor:'wg-t', onEnter:null,
+    calc:function(){
+      var e=getR('wg-t');
+      var cx=e.l+e.w/2; var ax=Math.min(cx,TT_W-32);
+      var left=clamp(cx-ax); ax=cx-left;
+      return{top:Math.max(e.t-150,56),left:left,dir:'up',ax:ax};
+    }
+  },
+  {
+    hl:'Each workspace reveals only what is relevant',
+    desc:'Switch between Execute, Build, Monitor and Admin. Each workspace shows only its own sections — Execute surfaces your Tasks and Start Forms; Build opens the process editor. Switching never resets what you were doing.',
+    anchor:'modesw-el',
+    onEnter:function(){setMode('execute');},
+    calc:function(){
+      var e=getR('modesw-el');
+      return{top:e.b+12,left:clamp(e.l),dir:'down',ax:32};
+    }
+  },
+  {
+    hl:'Three things FireStart does for you', desc:'', xtra:'features', anchor:'mc-ex',
+    onEnter:function(){goHome();},
+    calc:function(){
+      var e=getR('mc-ex');
+      var cx=e.l+e.w/2; var ax=Math.min(cx,TT_W-32);
+      var left=clamp(cx-ax); ax=cx-left;
+      return{top:e.b+12,left:left,dir:'down',ax:ax};
+    }
+  }
+];
+function clearHL(){if(prevHL){prevHL.classList.remove('hl');prevHL=null;}}
+function setHL(id){clearHL();var el=R(id);if(el){el.classList.add('hl');prevHL=el;}}
+function renderTour(){
+  var S=TOUR[tourStep];
+  if(S.onEnter) S.onEnter();
+  R('tt-hl').textContent=S.hl;
+  R('tt-desc').textContent=S.desc||'';
+  R('tt-desc').style.display=S.desc?'':'none';
+  var xtra=R('tt-xtra');
+  if(S.xtra==='skill'){
+    xtra.innerHTML='<div class="skill-list">'
+      +[['🌱','New to this','First time with process automation'],
+        ['🚀','Some experience','Used similar tools before'],
+        ['⭐','Expert','Work with automation daily']]
+      .map(function(o){return'<button class="sk" onclick="advTour()"><span class="sk-icon">'+o[0]+'</span><div class="sk-text"><span class="sk-n">'+o[1]+'</span><span class="sk-s">'+o[2]+'</span></div></button>';})
+      .join('')+'</div>';
+    R('tt-nxt').style.display='none';
+  } else if(S.xtra==='features'){
+    xtra.innerHTML='<div class="feat-list">'
+      +[['🔁','#FEE2E2','Automate repetitive tasks','Build once, run forever — no code required'],
+        ['📋','#EFF6FF','Assign work through workflows','Tasks land in the right queue automatically'],
+        ['📊','#ECFDF5','Monitor every process live','Full visibility into status and bottlenecks']]
+      .map(function(f){return'<button class="feat" onclick="advTour()"><div class="feat-ic" style="background:'+f[1]+'">'+f[0]+'</div><div class="feat-text"><span class="feat-n">'+f[2]+'</span><span class="feat-s">'+f[3]+'</span></div></button>';})
+      .join('')+'</div>';
+    R('tt-nxt').style.display='';
+    R('tt-nxt').textContent='Done';
+  } else {
+    xtra.innerHTML='';
+    R('tt-nxt').style.display='';
+    R('tt-nxt').textContent=tourStep<4?'Next →':'Done';
+  }
+  R('tt-prog').style.width=Math.round((tourStep+1)/5*100)+'%';
+  R('tt-label').textContent=(tourStep+1)+' / 5';
+  var c=S.calc();
+  var tt=R('tt');
+  tt.setAttribute('data-dir',c.dir);
+  tt.style.top=c.top+'px'; tt.style.left=c.left+'px';
+  tt.style.display='block';
+  R('tt-card').style.setProperty('--ax',(c.ax||24)+'px');
+  setHL(S.anchor);
+}
+function launchTour(){
+  closePanel();
+  tourStep=0;
+  goHome();
+  R('dim').classList.add('on');
+  renderTour();
+}
+function advTour(){
+  if(tourStep<4){tourStep++;renderTour();}
+  else{closeTour();}
+}
+function closeTour(){
+  R('tt').style.display='none';
+  R('dim').classList.remove('on');
+  clearHL();
+  tourStep=0;
+}
+
+/* ── INIT ── */
+goHome();
+</script>
+</body>
+</html>
