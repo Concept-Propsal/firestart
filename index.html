@@ -116,6 +116,31 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;backg
 .rp-link{font-size:12px;color:var(--blue);text-decoration:underline;cursor:pointer;}
 .rp-ann{display:block;width:100%;font-size:12.5px;font-weight:600;color:#fff;background:var(--brand);border:none;border-radius:6px;padding:9px;cursor:pointer;margin-top:4px;}
 
+/* ── GENERIC VIEW (Monitor + Admin) ────────────────────────────────── */
+.generic-view{display:none;grid-template-columns:220px 1fr 180px;min-height:480px;}
+.generic-view.show{display:grid;}
+.gv-sb{background:var(--bg);border-right:1px solid var(--bdr);padding:12px 8px;}
+.gv-search{display:flex;align-items:center;gap:6px;height:28px;background:var(--bg);border:1px solid var(--bi);border-radius:5px;padding:0 9px;font-size:11px;color:var(--tm);margin-bottom:9px;}
+.gv-item{padding:7px 8px;border-radius:4px;font-size:11.5px;color:var(--t1);margin-bottom:2px;cursor:pointer;}
+.gv-item:hover{background:var(--chip);}
+.gv-item.on{background:var(--selbg);}
+.gv-meta{font-size:10px;color:var(--tm);margin-top:1px;}
+.gv-main{padding:18px 20px;background:var(--bg);}
+.gv-title{font-size:20px;font-weight:600;color:var(--t1);margin-bottom:14px;}
+.gv-tbl{width:100%;border-collapse:collapse;}
+.gv-tbl th{font-size:11px;color:var(--t2);text-align:left;padding:7px 10px;border-bottom:1px solid var(--bdr);}
+.gv-tbl td{font-size:12.5px;color:var(--t1);padding:7px 10px;border-bottom:1px solid var(--bdr);}
+.gv-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.gv-blue{background:#EFF6FF;color:#1d4ed8;}
+.gv-green{background:#D1FAE5;color:#065F46;}
+.gv-orange{background:#FEF3C7;color:#92400E;}
+.gv-rp{background:var(--bg);border-left:1px solid var(--bdr);padding:14px;}
+.gv-rp-hdr{font-size:11.5px;color:var(--t2);font-weight:600;padding-bottom:8px;border-bottom:1px solid var(--bdr);margin-bottom:10px;}
+.gv-stat{display:flex;flex-direction:column;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
+.gv-stat:last-child{border:none;}
+.gv-stat-n{font-size:26px;font-weight:700;line-height:1;}
+.gv-stat-l{font-size:11px;color:var(--tm);margin-top:3px;}
+
 /* ── START FORMS VIEW ─────────────────────────────────────────────────── */
 .sf-body{display:none;grid-template-columns:240px 1fr 220px;min-height:480px;}
 .sf-body.show{display:grid;}
@@ -452,6 +477,62 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;backg
       </div>
     </div>
 
+    <!-- MONITOR VIEW -->
+    <div class="generic-view" id="monitor-view">
+      <div class="gv-sb">
+        <div class="gv-search"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suchen…</div>
+        <div class="gv-item on">Rechnungsprüfung (laufend)<div class="gv-meta">Gestartet: 27.11.2025</div></div>
+        <div class="gv-item">Approval Process<div class="gv-meta">Gestartet: 1.12.2025</div></div>
+        <div class="gv-item">Urlaubsantrag DEMO<div class="gv-meta">Gestartet: 3.12.2025</div></div>
+        <div class="gv-item">Feedback Review<div class="gv-meta">Gestartet: 5.12.2025</div></div>
+      </div>
+      <div class="gv-main">
+        <div class="gv-title">Workflows — Running Instances</div>
+        <table class="gv-tbl">
+          <tr><th>Workflow</th><th>Started by</th><th>Status</th><th>Current step</th><th>Since</th></tr>
+          <tr><td>Rechnungsprüfung</td><td>Sofia Müller</td><td><span class="gv-badge gv-blue">Running</span></td><td>Buha review</td><td>3 days</td></tr>
+          <tr><td>Approval Process</td><td>Max Mustermann</td><td><span class="gv-badge gv-green">Completed</span></td><td>—</td><td>1 day</td></tr>
+          <tr><td>Urlaubsantrag DEMO</td><td>Anna Weber</td><td><span class="gv-badge gv-blue">Running</span></td><td>Manager approval</td><td>2 days</td></tr>
+          <tr><td>Feedback Review</td><td>Peter Gruber</td><td><span class="gv-badge gv-orange">Waiting</span></td><td>HR sign-off</td><td>5 hrs</td></tr>
+          <tr><td>Test Calling</td><td>System</td><td><span class="gv-badge gv-green">Completed</span></td><td>—</td><td>4 days</td></tr>
+        </table>
+      </div>
+      <div class="gv-rp">
+        <div class="gv-rp-hdr">Summary</div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--blue)">3</span><span class="gv-stat-l">Running</span></div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--green)">2</span><span class="gv-stat-l">Completed</span></div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--orange)">1</span><span class="gv-stat-l">Waiting</span></div>
+      </div>
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div class="generic-view" id="admin-view">
+      <div class="gv-sb">
+        <div class="gv-search"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suchen…</div>
+        <div class="gv-item on">Buchhaltung<div class="gv-meta">4 members</div></div>
+        <div class="gv-item">Management<div class="gv-meta">2 members</div></div>
+        <div class="gv-item">HR<div class="gv-meta">3 members</div></div>
+        <div class="gv-item">IT Admins<div class="gv-meta">2 members</div></div>
+      </div>
+      <div class="gv-main">
+        <div class="gv-title">Groups</div>
+        <table class="gv-tbl">
+          <tr><th>Name</th><th>Members</th><th>Workflows</th><th>Created</th></tr>
+          <tr><td>Buchhaltung</td><td>4</td><td>Rechnungsprüfung, Spesen</td><td>12.01.2025</td></tr>
+          <tr><td>Management</td><td>2</td><td>Approval Process</td><td>15.01.2025</td></tr>
+          <tr><td>HR</td><td>3</td><td>Urlaubsantrag, Feedback Review</td><td>20.01.2025</td></tr>
+          <tr><td>IT Admins</td><td>2</td><td>All workflows</td><td>01.01.2025</td></tr>
+        </table>
+        <div class="exec-foot"><button class="btn-blue">+ New Group</button></div>
+      </div>
+      <div class="gv-rp">
+        <div class="gv-rp-hdr">Overview</div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--t1)">4</span><span class="gv-stat-l">Groups</span></div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--t1)">11</span><span class="gv-stat-l">Total members</span></div>
+        <div class="gv-stat"><span class="gv-stat-n" style="color:var(--t1)">6</span><span class="gv-stat-l">Workflows</span></div>
+      </div>
+    </div>
+
     <!-- DIM LAYER -->
     <div class="dim-layer" id="dim"></div>
 
@@ -506,13 +587,7 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;backg
     <span class="tb-label">Quick access:</span>
     <button class="tb-btn primary" onclick="launchTour()">▶ Start guided tour</button>
     <button class="tb-btn blue" onclick="launchPanel()">⊡ Open onboarding panel</button>
-    <div class="tb-sep"></div>
-    <button class="tb-btn" onclick="goHome()">🏠 Home</button>
-    <button class="tb-btn" onclick="setMode('execute')">⚡ Execute → Tasks</button>
-    <button class="tb-btn" onclick="goSection('startforms')">▶ Start Forms</button>
-    <button class="tb-btn" onclick="setMode('build')">🔧 Build → Processes</button>
-    <div class="tb-sep"></div>
-    <span class="tb-label" id="state-label" style="color:var(--blue);">Home screen</span>
+    <span class="tb-label" id="state-label" style="color:var(--blue);margin-left:8px;">Home screen</span>
   </div>
 
 </div><!-- /browser-chrome -->
@@ -537,6 +612,8 @@ function hideAllViews(){
   R('exec-view').classList.remove('show');
   R('sf-view').classList.remove('show');
   R('proc-view').classList.remove('show');
+  R('monitor-view').classList.remove('show');
+  R('admin-view').classList.remove('show');
 }
 function goHome(){
   curMode=''; curSection='';
@@ -578,19 +655,30 @@ function setMode(m){
       +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suche nach Prozessen…</div>';
     R('proc-view').classList.add('show');
     setState('Build → Processes');
-  } else if(m==='monitor'||m==='admin'){
+  } else if(m==='monitor'){
     R('row2').classList.remove('hidden');
-    var items=m==='monitor'
-      ?['Workflows','Landscapes']
-      :['Groups','Templates','Reference'];
-    R('row2').innerHTML=items.map((it,i)=>'<div class="r2i'+(i===0?' on':'')+'" onclick="">'+it+'</div>').join('')
+    R('row2').innerHTML=
+      '<div class="r2i on" onclick="goSection(\'workflows\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="9" y="14" width="6" height="6" rx="1"/><path d="M5 9v2a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V9"/></svg>Workflows</div>'
+      +'<div class="r2i" onclick="goSection(\'landscapes\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 17l4-8 4 5 3-3 4 6"/><path d="M3 21h18"/></svg>Landscapes</div>'
       +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suchen…</div>';
-    // show placeholder
     hideAllViews();
-    R('home-view').classList.add('show');
-    R('home-view').querySelector('.wlc').textContent=m==='monitor'?'Monitor':'Admin';
-    R('home-view').querySelector('.wlc-s').textContent=m==='monitor'?'Track all running workflow instances.':'Configure users, roles, and templates.';
-    setState((m==='monitor'?'Monitor':'Admin')+' mode');
+    R('monitor-view').classList.add('show');
+    setState('Monitor → Workflows');
+  } else if(m==='admin'){
+    R('row2').classList.remove('hidden');
+    R('row2').innerHTML=
+      '<div class="r2i on" onclick="goSection(\'groups\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Groups</div>'
+      +'<div class="r2i" onclick="goSection(\'templates\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>Templates</div>'
+      +'<div class="r2i" onclick="goSection(\'reference\')">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Reference</div>'
+      +'<div class="r2sr"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Suchen…</div>';
+    hideAllViews();
+    R('admin-view').classList.add('show');
+    setState('Admin → Groups');
   }
 }
 function goSection(s){
@@ -609,6 +697,13 @@ function goSection(s){
   } else if(s==='processes'){
     R('proc-view').classList.add('show');
     setState('Build → Processes');
+  } else if(s==='workflows'||s==='landscapes'){
+    R('monitor-view').classList.add('show');
+    setState('Monitor → '+(s==='workflows'?'Workflows':'Landscapes'));
+  } else if(s==='groups'||s==='templates'||s==='reference'){
+    R('admin-view').classList.add('show');
+    var label={groups:'Groups',templates:'Templates',reference:'Reference'};
+    setState('Admin → '+label[s]);
   }
 }
 
